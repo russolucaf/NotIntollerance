@@ -1,27 +1,39 @@
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, session
+from flask_session import Session
 from SignUpForm import SignUp
 from SignInForm import SignInForm
-from flask_mongoengine import MongoEngine
 from mongoengine import *
 from User import User
-from passlib.context import CryptContext
 from flask_bcrypt import Bcrypt
+from datetime import timedelta
+import secrets
 
 
 app = Flask(__name__)
+
 bcrypt = Bcrypt(app)
-app.config['SECRET_KEY'] = '4599b8b8c2a893fc8b453da9'
+# app.config['SECRET_KEY'] = '4599b8b8c2a893fc8b453da9'
+
+app.secret_key = secrets.token_urlsafe(32)
+app.config['SESSION_TYPE'] = 'mongodb'
+
+Session(app)
 
 connect('admin')
 
 
 @app.route("/")
 def index():
-    return render_template('index.html', name=index)
+    if 'user_profile' in session:
+        return render_template('index.html', name=index)
+    else:
+        return render_template('index.html', name=index)
 
 
 @app.route('/sign_up', methods=['POST', 'GET'])
 def login_sign_up():
+    if 'user_profile' in session:
+        return redirect(url_for('index'))
     form = SignUp()
     if request.method == "GET":
         return render_template('sign_up.html', form=form)
@@ -41,13 +53,22 @@ def login_sign_up():
                 return redirect(url_for('login_sign_up'))
         else:
             users.save()
-            flash("Registrazione avvenuta con successo!")
+            session['user_profile'] = users
+            redirect(url_for('index'))
     return redirect(url_for('login_sign_up'))
+
+
+@app.route('/logout')
+def login_exit():
+    session.pop('user_profile', None)
+    return redirect(url_for('index'))
 
 
 @app.route('/sign_in', methods=['POST', 'GET'])
 def login_sign_in():
     form = SignInForm()
+    if 'user_profile' in session:
+        return redirect(url_for('index'))
     if request.method == "GET":
         return render_template('sign_in.html', form=form)
     else:
@@ -55,10 +76,11 @@ def login_sign_in():
         password = request.form.get('password')
         for users in User.objects(email=email, password=password):
             if users.email == email and users.password == password:
-                flash("Benvenuto " + users.name + "!")
+                session['user_profile'] = users.email
                 return redirect(url_for('index'))
         else:
             flash("Email o password non validi!")
+            redirect(url_for('login_sign_in'))
     return render_template('sign_in.html', form=form)
 
 
