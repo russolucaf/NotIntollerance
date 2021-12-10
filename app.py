@@ -1,6 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_session import Session
-
 from RestaurantForm import RestaurantForm
 from SignUpForm import SignUp
 from SignInForm import SignInForm
@@ -10,7 +9,6 @@ from Restaurant import Restaurant
 from flask_bcrypt import Bcrypt
 from datetime import timedelta
 import secrets
-
 
 app = Flask(__name__)
 
@@ -100,19 +98,26 @@ def restaurant():
         return render_template('restaurant_form.html', form=form)
     else:
         restaurants = Restaurant()
+        restaurants.partita_iva = request.form.get('partita_iva')
         restaurants.name = request.form.get('name')
-        restaurants.position = request.form.get('position')
+        restaurants.address = request.form.get('address')
+        restaurants.city = request.form.get('city')
         restaurants.email = request.form.get('email')
+        if restaurants.email is None:
+            flash("Errore")
+            return redirect(url_for('restaurant'))
         for rest in Restaurant.objects(email=restaurants.email):
             if restaurants.email == rest.email:
-                flash("Email già esistente!")
+                flash("Email o partita iva già esistente!")
+                return redirect(url_for('restaurant'))
+        for rest in Restaurant.objects(partita_iva=restaurants.partita_iva):
+            if restaurants.partita_iva == rest.partita_iva:
+                flash("Email o partita iva già esistente!")
                 return redirect(url_for('restaurant'))
         else:
             restaurants.save()
             flash('Registrazione in fase di accettazione!')
-            redirect(url_for('restaurant'))
-
-    return render_template('restaurant_form.html', form=form)
+            return redirect(url_for('restaurant'))
 
 
 if __name__ == '__main__':

@@ -5,17 +5,25 @@
     {{ form.hidden_tag() }}
         <div class="sign_in_header" style="text-align: center">
           <label class="sign_in_header_h1">
-              <h1 class="display-5">Registrati come ristorante con Partita iva, Via ed Email</h1>
+              <h1 class="display-5">Registrati come ristorante con Partita iva, nome, indirizzo, città ed email</h1>
               <hr>
           </label>
         </div>
         <div class="mb-3">
-          {{ form.name.label(class="form-label", for="name") }}
-          {{ form.name(class="form-control", type="text", placeholder="Partita iva", id="name") }}
+          {{ form.partita_iva.label(class="form-label", for="partita_iva") }}
+          {{ form.partita_iva(class="form-control", type="text", placeholder="Iva", id="partiva_iva") }}
         </div>
         <div class="mb-3">
-            {{ form.position.label(clas="form-label", for="position") }}
-            {{ form.position(class="form-control", type="text", placeholder="Via", id="position") }}
+          {{ form.name.label(class="form-label", for="name") }}
+          {{ form.name(class="form-control", type="text", placeholder="Nome", id="name") }}
+        </div>
+        <div class="mb-3">
+            {{ form.address.label(clas="form-label", for="address") }}
+            {{ form.address(class="form-control", type="text", placeholder="Via", id="address") }}
+        </div>
+        <div class="mb-3">
+          {{ form.city.label(class="form-label", for="city") }}
+          {{ form.city(class="form-control", type="text", placeholder="Citta", id="city") }}
         </div>
         <div class="mb-3">
           {{ form.email.label(class="form-label", for="email") }}
