@@ -11,4 +11,3 @@ class SignUp(FlaskForm):
     surname = StringField(label='Cognome')
     email = StringField(label='Email')
     password = PasswordField(label='Password')
-    submit = SubmitField(label='Submit')

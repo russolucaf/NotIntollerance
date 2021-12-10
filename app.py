@@ -1,9 +1,12 @@
 from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_session import Session
+
+from RestaurantForm import RestaurantForm
 from SignUpForm import SignUp
 from SignInForm import SignInForm
 from mongoengine import *
 from User import User
+from Restaurant import Restaurant
 from flask_bcrypt import Bcrypt
 from datetime import timedelta
 import secrets
@@ -83,6 +86,33 @@ def login_sign_in():
             flash("Email o password non validi!")
             redirect(url_for('login_sign_in'))
     return render_template('sign_in.html', form=form)
+
+
+@app.route('/restaurant_view')
+def restaurant_view():
+    return render_template('restaurant_view.html')
+
+
+@app.route('/restaurant_register', methods=["GET", "POST"])
+def restaurant():
+    form = RestaurantForm()
+    if request.method == "GET":
+        return render_template('restaurant_form.html', form=form)
+    else:
+        restaurants = Restaurant()
+        restaurants.name = request.form.get('name')
+        restaurants.position = request.form.get('position')
+        restaurants.email = request.form.get('email')
+        for rest in Restaurant.objects(email=restaurants.email):
+            if restaurants.email == rest.email:
+                flash("Email già esistente!")
+                return redirect(url_for('restaurant'))
+        else:
+            restaurants.save()
+            flash('Registrazione in fase di accettazione!')
+            redirect(url_for('restaurant'))
+
+    return render_template('restaurant_form.html', form=form)
 
 
 if __name__ == '__main__':

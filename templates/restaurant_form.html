@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <form class="container-fluid sign_in" style="margin-top: 5%; margin-bottom: 3%" method="POST" action="{{ url_for('restaurant') }}">
+    {{ form.hidden_tag() }}
+        <div class="sign_in_header" style="text-align: center">
+          <label class="sign_in_header_h1">
+              <h1 class="display-5">Registrati come ristorante con Partita iva, Via ed Email</h1>
+              <hr>
+          </label>
+        </div>
+        <div class="mb-3">
+          {{ form.name.label(class="form-label", for="name") }}
+          {{ form.name(class="form-control", type="text", placeholder="Partita iva", id="name") }}
+        </div>
+        <div class="mb-3">
+            {{ form.position.label(clas="form-label", for="position") }}
+            {{ form.position(class="form-control", type="text", placeholder="Via", id="position") }}
+        </div>
+        <div class="mb-3">
+          {{ form.email.label(class="form-label", for="email") }}
+          {{ form.email(type="email", class="form-control", placeholder="Email", id="email") }}
+        <div id="emailHelp" class="form-text">Noi non condivideremo mai la tua email con qualcun'altro.</div>
+        </div>
+          <button type="submit" class="btn btn-outline-primary">Registrati</button>
+    </form>
+
+
+{% endblock %}
