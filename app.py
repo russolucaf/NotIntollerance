@@ -46,14 +46,15 @@ def login_sign_up():
         if (len(password) <= 8) or (len(password) >= 20):
             flash("Attenzione, password troppo lunga o corta!")
             return redirect(url_for('login_sign_up'))
-        users.password = password
+        password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+        users.password = password_hash
         for user in User.objects(email=users.email):
             if user.email == users.email:
                 flash("Email già esistente!")
                 return redirect(url_for('login_sign_up'))
         else:
             users.save()
-            session['user_profile'] = users
+            session['user_profile'] = users.email
             redirect(url_for('index'))
     return redirect(url_for('login_sign_up'))
 
@@ -74,8 +75,8 @@ def login_sign_in():
     else:
         email = request.form.get('email')
         password = request.form.get('password')
-        for users in User.objects(email=email, password=password):
-            if users.email == email and users.password == password:
+        for users in User.objects(email=email):
+            if users.email == email and bcrypt.check_password_hash(users.password, password):
                 session['user_profile'] = users.email
                 return redirect(url_for('index'))
         else:
