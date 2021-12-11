@@ -88,7 +88,15 @@ def login_sign_in():
 
 @app.route('/restaurant_view')
 def restaurant_view():
-    return render_template('restaurant_view.html')
+    rest_objects = []
+    for rest in Restaurant.objects:
+        rest_objects.append(Restaurant(rest.partita_iva,
+                                       rest.name,
+                                       rest.address,
+                                       rest.city,
+                                       rest.email,
+                                       rest.number_phone))
+    return render_template('restaurant_view.html', rest_objects=rest_objects)
 
 
 @app.route('/restaurant_register', methods=["GET", "POST"])
@@ -97,12 +105,12 @@ def restaurant():
     if request.method == "GET":
         return render_template('restaurant_form.html', form=form)
     else:
-        restaurants = Restaurant()
-        restaurants.partita_iva = request.form.get('partita_iva')
-        restaurants.name = request.form.get('name')
-        restaurants.address = request.form.get('address')
-        restaurants.city = request.form.get('city')
-        restaurants.email = request.form.get('email')
+        restaurants = Restaurant(request.form.get('partita_iva'),
+                                 request.form.get('name'),
+                                 request.form.get('address'),
+                                 request.form.get('city'),
+                                 request.form.get('email'),
+                                 request.form.get('number_phone'))
         if restaurants.email is None:
             flash("Errore")
             return redirect(url_for('restaurant'))

@@ -11,3 +11,4 @@ class RestaurantForm(FlaskForm):
     address = StringField(label="Via")
     city = StringField(label="Citta")
     email = EmailField(label="Email")
+    number_phone = StringField(label="Numero")
