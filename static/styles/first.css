@@ -6,3 +6,7 @@
 .sign_in_header_h1{
     text-align: center;
 }
+
+div#map {
+    z-index: 1;
+}
