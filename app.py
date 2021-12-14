@@ -40,9 +40,9 @@ def login_sign_up():
         return render_template('sign_up.html', form=form)
     else:
         users = User()
-        users.name = request.form.get('name')
-        users.surname = request.form.get('surname')
-        users.email = request.form.get('email')
+        users.name = request.form.get('name').lower()
+        users.surname = request.form.get('surname').lower()
+        users.email = request.form.get('email').lower()
         password = request.form.get('password')
         if (len(password) <= 8) or (len(password) >= 20):
             flash("Attenzione, password troppo lunga o corta!")
@@ -109,7 +109,7 @@ def restaurant():
                                  request.form.get('name'),
                                  request.form.get('address'),
                                  request.form.get('city'),
-                                 request.form.get('email'),
+                                 request.form.get('email').lower(),
                                  request.form.get('number_phone'))
         if restaurants.email is None:
             flash("Errore")
@@ -126,6 +126,25 @@ def restaurant():
             restaurants.save()
             flash('Registrazione in fase di accettazione!')
             return redirect(url_for('restaurant'))
+
+
+@app.route('/search_restaurant', methods=["POST", "GET"])
+def restaurant_search():
+    rest_objects = []
+    if request.method == "POST":
+        search = request.form.get('search_form').lower()
+        for rest in Restaurant.objects():
+            if rest.name.lower() == search:
+                rest_objects.append(Restaurant(rest.partita_iva,
+                                               rest.name,
+                                               rest.address,
+                                               rest.city,
+                                               rest.email,
+                                               rest.number_phone))
+                return render_template('restaurant_view.html', rest_objects=rest_objects)
+        else:
+            flash("Non esiste nessun ristorante con questo nome")
+            return redirect(url_for('restaurant_view'))
 
 
 if __name__ == '__main__':
