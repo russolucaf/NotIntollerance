@@ -6,9 +6,11 @@ from wtforms import SubmitField
 
 
 class RestaurantForm(FlaskForm):
-    partita_iva = StringField(label="Iva")
+    partita_iva = StringField(label="Partita Iva")
     name = StringField(label="Nome")
     address = StringField(label="Via")
+    civic_number = StringField(label="Numero Civico")
+    cap = StringField(label="Cap")
     city = StringField(label="Citta")
     email = EmailField(label="Email")
     number_phone = StringField(label="Numero")

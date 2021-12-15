@@ -93,6 +93,8 @@ def restaurant_view():
         rest_objects.append(Restaurant(rest.partita_iva,
                                        rest.name,
                                        rest.address,
+                                       rest.civic_number,
+                                       rest.cap,
                                        rest.city,
                                        rest.email,
                                        rest.number_phone))
@@ -108,6 +110,8 @@ def restaurant():
         restaurants = Restaurant(request.form.get('partita_iva'),
                                  request.form.get('name'),
                                  request.form.get('address'),
+                                 request.form.get('civic_number'),
+                                 request.form.get('cap'),
                                  request.form.get('city'),
                                  request.form.get('email').lower(),
                                  request.form.get('number_phone'))
@@ -134,10 +138,12 @@ def restaurant_search():
     if request.method == "POST":
         search = request.form.get('search_form').lower()
         for rest in Restaurant.objects():
-            if rest.name.lower() == search:
+            if search in rest.name.lower():
                 rest_objects.append(Restaurant(rest.partita_iva,
                                                rest.name,
                                                rest.address,
+                                               rest.civic_number,
+                                               rest.cap,
                                                rest.city,
                                                rest.email,
                                                rest.number_phone))
