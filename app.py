@@ -2,6 +2,8 @@ from flask import Flask, render_template, redirect, url_for, request, flash, ses
 from flask_session import Session
 from flask_mongoengine import MongoEngine
 from RestaurantForm import RestaurantForm
+from Review import Review
+from ReviewForm import ReviewForm
 from SignUpForm import SignUp
 from SignInForm import SignInForm
 from mongoengine import *
@@ -108,8 +110,28 @@ def restaurant_view():
                                        rest.cap,
                                        rest.city,
                                        rest.email,
+                                       rest.url_img,
                                        rest.number_phone))
     return render_template('restaurant_view.html', rest_objects=rest_objects)
+
+
+# NON CREA LA RECENSIONE SUL DB
+@app.route('/restaurant_specific/<rest_object>', methods=['POST'])
+def restaurant_specific(rest_object):
+    form_review = ReviewForm()
+    if form_review.validate_on_submit():
+        review = Review(user_email=session['user_profile'],
+                        restaurant_email=rest_object,
+                        body=request.form.get('body'))
+        review.save()
+    review_objects = []
+    for rew in Review.objects(restaurant_email=rest_object):
+        review_objects.append(Review(user_email=rew.user_email,
+                                     restaurant_email=rew.restaurant_email,
+                                     body=rew.body))
+    for rest in Restaurant.objects(email=rest_object):
+        if rest.email == rest_object:
+            return render_template('restaurant_specific.html', rest=rest, form=form_review, rew=review_objects)
 
 
 @app.route('/restaurant_register', methods=["GET", "POST"])
@@ -125,6 +147,7 @@ def restaurant():
                                  request.form.get('cap'),
                                  request.form.get('city'),
                                  request.form.get('email').lower(),
+                                 request.form.get('url_img'),
                                  request.form.get('number_phone'))
         if restaurants.email is None:
             flash("Errore")
@@ -157,6 +180,7 @@ def restaurant_search():
                                                rest.cap,
                                                rest.city,
                                                rest.email,
+                                               rest.url_img,
                                                rest.number_phone))
                 return render_template('restaurant_view.html', rest_objects=rest_objects)
         else:

@@ -13,4 +13,5 @@ class RestaurantForm(FlaskForm):
     cap = StringField(label="Cap")
     city = StringField(label="Citta")
     email = EmailField(label="Email")
+    url_img = StringField(label="URL Foto")
     number_phone = StringField(label="Numero")

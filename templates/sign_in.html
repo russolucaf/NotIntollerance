@@ -2,7 +2,7 @@
 
 {% block content %}
 
-    <form class="container-fluid sign_in" id="sign_in_form" method="POST" action="{{ url_for('login_sign_in') }}">
+    <form class="container sign_in" id="sign_in_form" style="margin-top: 10%; margin-bottom: 3%" method="POST" action="{{ url_for('login_sign_in') }}">
     {{ form.hidden_tag() }}
           <div class="sign_in_header" style="text-align: center">
               <label class="sign_in_header_h1">

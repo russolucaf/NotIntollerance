@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <div class="container" style="margin-top: 5%; width: 70%">
+        <div class="row">
+            <img src="{{ rest.url_img }}" class="col" alt="Ristorante">
+            <div class="col">
+                <h1 class="display-4">{{ rest.name }}</h1>
+                <p class="lead">Ristorante <b>{{ rest.name }}</b> in Via {{ rest.address }}, {{ rest.civic_number }} con capoluogo a {{ rest.city }}, {{ rest.cap }}</p>
+                <hr class="my-4">
+                <p>Email: {{ rest.email }}</p>
+                <p>Numero di telefono: {{ rest.number_phone }}</p>
+            </div>
+        </div>
+        <hr>
+        <br><br>
+        {% for rec in rew %}
+            <div class="jumbotron bg-light rounded-2" style="margin-bottom: 5%; padding: 2%">
+                <blockquote class="blockquote">
+                    <p class="mb-3">{{ rec.body }}</p>
+                    <footer class="blockquote-footer">Dice <cite title="{{ rec.user_email }}">{{ rec.user_email }}</cite></footer>
+                </blockquote>
+            </div>
+        {% endfor %}
+        {% if session['user_profile'] %}
+            <form method="POST" action="{{ url_for('restaurant_specific', rest_object=rest.email) }}">
+                <div class="form-group" style="margin-bottom: 5%; padding: 3%">
+                    {{ form.csrf_token }}
+                    <label class="lead" for="review">Scrivi una tua recensione:</label>
+                    {{ form.body(class="form-control", id="review", placeholder="Recensione") }}
+                    <br>
+                    <button type="submit" class="btn btn-outline-primary" style="float: right">Invia</button>
+                </div>
+            </form>
+        {% endif %}
+
+    </div>
+
+{% endblock %}

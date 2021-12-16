@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <form class="container-fluid sign_in" style="margin-top: 5%; margin-bottom: 3%" method="POST" action="{{ url_for('restaurant') }}">
+    <form class="container sign_in" style="margin-top: 5%; margin-bottom: 3%" method="POST" action="{{ url_for('restaurant') }}">
     {{ form.hidden_tag() }}
         <div class="sign_in_header" style="text-align: center">
           <label class="sign_in_header_h1">
@@ -37,6 +37,10 @@
           {{ form.email.label(class="form-label", for="email") }}
           {{ form.email(type="email", class="form-control", placeholder="Email", id="email") }}
         <div id="emailHelp" class="form-text">Noi non condivideremo mai la tua email con qualcun'altro.</div>
+        </div>
+        <div class="mb-3">
+            {{ form.url_img.label(clas="form-label", for="url_img") }}
+            {{ form.url_img(class="form-control", type="text", placeholder="URL Foto", id="url_img") }}
         </div>
         <div class="mb-3">
           {{ form.number_phone.label(class="form-label", for="number_phone") }}
