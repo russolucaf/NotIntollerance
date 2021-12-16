@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_session import Session
+from flask_mongoengine import MongoEngine
 from RestaurantForm import RestaurantForm
 from SignUpForm import SignUp
 from SignInForm import SignInForm
@@ -7,6 +8,7 @@ from mongoengine import *
 from User import User
 from Restaurant import Restaurant
 from flask_bcrypt import Bcrypt
+import pymongo
 from datetime import timedelta
 import secrets
 
@@ -17,10 +19,18 @@ bcrypt = Bcrypt(app)
 
 app.secret_key = secrets.token_urlsafe(32)
 app.config['SESSION_TYPE'] = 'mongodb'
-
+myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+my_db = myclient['admin']
+my_collection = my_db['user']
 Session(app)
 
 connect('admin')
+
+
+@app.before_request
+def session_lifetime():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=5)
 
 
 @app.route("/")
@@ -56,8 +66,8 @@ def login_sign_up():
         else:
             users.save()
             session['user_profile'] = users.email
-            redirect(url_for('index'))
-    return redirect(url_for('login_sign_up'))
+            session['user_name'] = users.name
+            return redirect(url_for('index'))
 
 
 @app.route('/logout')
@@ -79,6 +89,7 @@ def login_sign_in():
         for users in User.objects(email=email):
             if users.email == email and bcrypt.check_password_hash(users.password, password):
                 session['user_profile'] = users.email
+                session['user_name'] = users.name
                 return redirect(url_for('index'))
         else:
             flash("Email o password non validi!")
@@ -151,6 +162,29 @@ def restaurant_search():
         else:
             flash("Non esiste nessun ristorante con questo nome")
             return redirect(url_for('restaurant_view'))
+
+
+@app.route('/user_profile', methods=["POST", "GET"])
+def user_profile():
+    form = SignInForm()
+    if 'user_profile' in session:
+        if request.method == "POST":
+            new_password = request.form.get('password')
+            if (len(new_password) <= 8) or (len(new_password) >= 20):
+                flash("Attenzione, password troppo lunga o corta!")
+                return redirect(url_for('user_profile'))
+            else:
+                new_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+                for users in User.objects():
+                    if users.email == session['user_profile']:
+                        old_password = {'password': users.password}
+                        nuova_password = {'$set': {'password': new_password}}
+                        my_collection.update_one(old_password, nuova_password)
+                        flash('Password cambiata!')
+                        return redirect(url_for('user_profile'))
+    else:
+        return redirect(url_for('index'))
+    return render_template('user_profile.html', form=form)
 
 
 if __name__ == '__main__':

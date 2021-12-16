@@ -1,10 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-    <div class="container-fluid" style="margin-top: 50px; width: 80%; margin-bottom: 5%">
+    <div class="container-fluid sign_in" style="margin-top: 50px; width: 80%; margin-bottom: 5%">
         <div id="map" style="height: 600px"></div>
     </div>
-    {% if session['user_profile'] %}
-        <p> Benvenuto {{ session['user_profile'] }}!</p>
-    {% endif %}
 {% endblock %}

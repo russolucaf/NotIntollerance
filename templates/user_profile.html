@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+
+         <form class="container-fluid sign_in" style="margin-top: 5%; margin-bottom: 3%" method="POST" action="{{ url_for('user_profile') }}">
+          <div class="sign_in_header" style="text-align: center">
+              <label class="sign_in_header_h1">
+                  <h1 class="display-5">Cambia password!</h1>
+                  <hr>
+              </label>
+          </div>
+        <div class="mb-3">
+            {{ form.password.label(class="form-label", for="password") }}
+            {{ form.password(type="password", id="password", placeholder="Password", class="form-control") }}
+              <div id="passwordHelpBlock" class="form-text">
+                    La tua password deve contenere dagli 8-20 caratteri lunghi, contenere lettere e numeri, e non deve contenere spazi, caratteri speciali o emoji.
+              </div>
+        </div>
+        <button type="submit" class="btn btn-outline-primary">Cambia</button>
+     </form>
+
+{% endblock %}
