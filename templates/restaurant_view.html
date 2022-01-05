@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
 
-    <div class="container text-center" style="margin-top: 5%">
+    <div class="container">
         <div class="row g-5 align-items-center" id="row-ristoranti">
             {% for ristorante in rest_objects %}
-                <div class="col" style="margin-bottom: 4%;">
+                <div class="col-md-3" style="margin-bottom: 4%;">
                     <div class="card" style="width: 18rem;">
                         <img src="{{ ristorante.url_img }}" class="card-img-top img-fluid" alt="...">
                         <div class="card-body">
