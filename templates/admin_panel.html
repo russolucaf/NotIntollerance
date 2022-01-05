@@ -2,10 +2,39 @@
 
 {% block content %}
 
-    <div class="container text-center">
-        <h1 class="display-4">
-            Hello ADMIN
+    {% if session['admin'] %}
+        <div class="container">
+            <div class="row g-5 align-items-center" id="row-ristoranti">
+                {% for ristorante in rest %}
+                    <div class="col-md-3" style="margin-bottom: 4%;">
+                        <div class="card" style="width: 18rem;">
+                            <img src="{{ ristorante.url_img }}" class="card-img-top img-fluid" alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ ristorante.name }}</h5>
+                                <p class="card-text">Email: {{ ristorante.email }} </p>
+                                <p class="card-text">Via {{ristorante.address}}, {{ristorante.civic_number}}, {{ristorante.cap}} situato a {{ristorante.city}} </p>
+                                <p class="card-text">Numero di telefono: {{ ristorante.number_phone }} </p>
+                                <div class="text-center">
+                                    <form action="{{ url_for('approve_restaurant', resto_id=ristorante.id) }}" method="POST">
+                                    <button type="submit" class="btn btn-primary float-left" name="approve_resto">APPROVA</button>
+                                    </form>
+                                    <hr>
+                                    <form class="float-right" action="{{ url_for('delete_restaurant', resto_id=ristorante.id) }}" method="POST">
+                                        <button type="submit" class="btn btn-danger float-right" name="approve_resto">RIMUOVI</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <h1 class="display-4 text-center">
+            <p>
+                VOLEEEEEVI
+            </p>
         </h1>
-    </div>
+    {% endif %}
 
 {% endblock %}

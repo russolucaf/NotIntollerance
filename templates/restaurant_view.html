@@ -12,9 +12,17 @@
                             <p class="card-text">Email: {{ ristorante.email }} </p>
                             <p class="card-text">Via {{ristorante.address}}, {{ristorante.civic_number}}, {{ristorante.cap}} situato a {{ristorante.city}} </p>
                             <p class="card-text">Numero di telefono: {{ ristorante.number_phone }} </p>
-                            <form action="{{ url_for('restaurant_specific', rest_object=ristorante.email) }}" method="POST">
-                                <button class="btn btn-primary">Vai al ristorante</button>
-                            </form>
+                            <div class="text-center">
+                                <form action="{{ url_for('restaurant_specific', rest_object=ristorante.email) }}" method="POST">
+                                    <button class="btn btn-primary">Vai al ristorante</button>
+                                </form>
+                                {% if session['admin'] %}
+                                    <hr>
+                                    <form action="{{ url_for('delete_from_restaurants', resto_id=ristorante.id) }}" method="POST">
+                                        <button class="btn btn-danger">Rimuovi</button>
+                                    </form>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>

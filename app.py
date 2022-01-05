@@ -1,6 +1,8 @@
 from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_session import Session
 from flask_mongoengine import MongoEngine
+
+from RestaurantApprove import RestaurantApprove
 from RestaurantForm import RestaurantForm
 from Review import Review
 from ReviewForm import ReviewForm
@@ -34,12 +36,6 @@ connect('admin')
 def session_lifetime():
     session.permanent = True
     app.permanent_session_lifetime = timedelta(minutes=5)
-
-
-# ADMIN PANEL
-@app.route('/admin_panel')
-def admin_panel():
-    return render_template('admin_panel.html')
 
 
 @app.route("/")
@@ -114,15 +110,17 @@ def login_sign_in():
 def restaurant_view():
     rest_objects = []
     for rest in Restaurant.objects:
-        rest_objects.append(Restaurant(rest.partita_iva,
-                                       rest.name,
-                                       rest.address,
-                                       rest.civic_number,
-                                       rest.cap,
-                                       rest.city,
-                                       rest.email,
-                                       rest.url_img,
-                                       rest.number_phone))
+        rest_objects.append(Restaurant(
+                                       id=rest.id,
+                                       partita_iva=rest.partita_iva,
+                                       name=rest.name,
+                                       address=rest.address,
+                                       civic_number=rest.civic_number,
+                                       cap=rest.cap,
+                                       city=rest.city,
+                                       email=rest.email,
+                                       url_img=rest.url_img,
+                                       number_phone=rest.number_phone))
     return render_template('restaurant_view.html', rest_objects=rest_objects)
 
 
@@ -170,15 +168,15 @@ def restaurant():
     if request.method == "GET":
         return render_template('restaurant_form.html', form=form)
     else:
-        restaurants = Restaurant(request.form.get('partita_iva'),
-                                 request.form.get('name'),
-                                 request.form.get('address'),
-                                 request.form.get('civic_number'),
-                                 request.form.get('cap'),
-                                 request.form.get('city'),
-                                 request.form.get('email').lower(),
-                                 request.form.get('url_img'),
-                                 request.form.get('number_phone'))
+        restaurants = RestaurantApprove(request.form.get('partita_iva'),
+                                        request.form.get('name'),
+                                        request.form.get('address'),
+                                        request.form.get('civic_number'),
+                                        request.form.get('cap'),
+                                        request.form.get('city'),
+                                        request.form.get('email').lower(),
+                                        request.form.get('url_img'),
+                                        request.form.get('number_phone'))
         if restaurants.email is None:
             flash("Errore")
             return redirect(url_for('restaurant'))
@@ -194,6 +192,69 @@ def restaurant():
             restaurants.save()
             flash('Registrazione in fase di accettazione!')
             return redirect(url_for('restaurant'))
+
+
+# ADMIN PANEL
+@app.route('/admin_panel')
+def admin_panel():
+    rest = []
+    for risto in RestaurantApprove.objects:
+        rest.append(RestaurantApprove(
+                                   id=risto.id,
+                                   partita_iva=risto.partita_iva,
+                                   name=risto.name,
+                                   address=risto.address,
+                                   civic_number=risto.civic_number,
+                                   cap=risto.cap,
+                                   city=risto.city,
+                                   email=risto.email,
+                                   url_img=risto.url_img,
+                                   number_phone=risto.number_phone)
+        )
+    return render_template('admin_panel.html', rest=rest)
+
+
+@app.route('/approve_restaurant/<resto_id>', methods=['POST', 'GET'])
+def approve_restaurant(resto_id):
+    if 'admin' in session:
+        if resto_id:
+            for approve_resto in RestaurantApprove.objects(id=resto_id):
+                restaurants = Restaurant(
+                    approve_resto.partita_iva,
+                    approve_resto.name,
+                    approve_resto.address,
+                    approve_resto.civic_number,
+                    approve_resto.cap,
+                    approve_resto.city,
+                    approve_resto.email,
+                    approve_resto.url_img,
+                    approve_resto.number_phone
+                )
+                restaurants.save()
+            restaurant_delete = RestaurantApprove.objects(id=resto_id)
+            restaurant_delete.delete()
+
+    return redirect(url_for('admin_panel'))
+
+
+@app.route('/delete_restaurant/<resto_id>', methods=['POST', 'GET'])
+def delete_restaurant(resto_id):
+    if 'admin' in session:
+        if resto_id:
+            restaurant_delete = RestaurantApprove.objects(id=resto_id)
+            restaurant_delete.delete()
+
+    return redirect(url_for('admin_panel'))
+
+
+@app.route('/delete_from_restaurants/<resto_id>', methods=['POST', 'GET'])
+def delete_from_restaurants(resto_id):
+    if 'admin' in session:
+        if resto_id:
+            restaurant_delete = Restaurant.objects(id=resto_id)
+            restaurant_delete.delete()
+
+    return redirect(url_for('restaurant_view'))
 
 
 @app.route('/search_restaurant', methods=["POST", "GET"])
