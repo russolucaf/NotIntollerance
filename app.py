@@ -13,6 +13,7 @@ from flask_bcrypt import Bcrypt
 import pymongo
 from datetime import timedelta
 import secrets
+import time
 
 app = Flask(__name__)
 
@@ -33,6 +34,12 @@ connect('admin')
 def session_lifetime():
     session.permanent = True
     app.permanent_session_lifetime = timedelta(minutes=5)
+
+
+# ADMIN PANEL
+@app.route('/admin_panel')
+def admin_panel():
+    return render_template('admin_panel.html')
 
 
 @app.route("/")
@@ -75,6 +82,7 @@ def login_sign_up():
 @app.route('/logout')
 def login_exit():
     session.pop('user_profile', None)
+    session.pop('admin', None)
     return redirect(url_for('index'))
 
 
@@ -88,6 +96,9 @@ def login_sign_in():
     else:
         email = request.form.get('email')
         password = request.form.get('password')
+        if email == "lukaein@admin.it" and password == "lukaein99":
+            session['admin'] = email
+            return redirect(url_for('index'))
         for users in User.objects(email=email):
             if users.email == email and bcrypt.check_password_hash(users.password, password):
                 session['user_profile'] = users.email
@@ -115,23 +126,42 @@ def restaurant_view():
     return render_template('restaurant_view.html', rest_objects=rest_objects)
 
 
-# NON CREA LA RECENSIONE SUL DB
-@app.route('/restaurant_specific/<rest_object>', methods=['POST'])
+@app.route('/delete_review/<review_id>', methods=['POST'])
+def delete_review(review_id):
+    if 'admin' in session:
+        for review in Review.objects(id=review_id):
+            email = review.restaurant_email
+            if review_id:
+                review.delete()
+                return redirect(url_for('restaurant_specific', rest_object=email))
+    return redirect(url_for('delete_review', review_id=review_id))
+
+
+@app.route('/restaurant_specific/<rest_object>', methods=['POST', 'GET'])
 def restaurant_specific(rest_object):
     form_review = ReviewForm()
+
+    if request.form.get('body') == "" or request.form.get('body') == " ":
+        flash("Scrivi almeno qualcosa all'interno della recensione!")
+        return redirect(url_for('restaurant_view'))
     if form_review.validate_on_submit():
         review = Review(user_email=session['user_profile'],
                         restaurant_email=rest_object,
                         body=request.form.get('body'))
         review.save()
+
     review_objects = []
     for rew in Review.objects(restaurant_email=rest_object):
-        review_objects.append(Review(user_email=rew.user_email,
+        review_objects.append(Review(
+                                     id=rew.id,
+                                     user_email=rew.user_email,
                                      restaurant_email=rew.restaurant_email,
                                      body=rew.body))
     for rest in Restaurant.objects(email=rest_object):
         if rest.email == rest_object:
             return render_template('restaurant_specific.html', rest=rest, form=form_review, rew=review_objects)
+
+    return redirect(url_for('restaurant_specific', rest_object=rest_object))
 
 
 @app.route('/restaurant_register', methods=["GET", "POST"])

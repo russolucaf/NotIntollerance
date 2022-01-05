@@ -33,7 +33,7 @@
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container-fluid">
+      <div class="container">
         <b><a class="navbar-brand" href="{{ url_for('index') }}">!INTOLLERANCE</a></b>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -63,14 +63,18 @@
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Login
               </a>
-                {% if session['user_profile'] %}
+                {% if session['user_profile'] or session['admin'] %}
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li>
                             <a class="dropdown-item" href="{{ url_for('login_exit') }}">Esci</a>
                         </li>
                     </ul>
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="{{ url_for('user_profile') }}">Bentornato {{ session['user_name'] }}</a>
+                        {% if session['admin'] %}
+                            <a class="nav-link" aria-current="page" href="{{ url_for('admin_panel') }}">Bentornato {{ session['admin'] }}</a>
+                        {% else %}
+                            <a class="nav-link" aria-current="page" href="{{ url_for('user_profile') }}">Bentornato {{ session['user_name'] }}</a>
+                        {% endif %}
                     </li>
                 {% else %}
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -82,22 +86,24 @@
             </li>
           </ul>
           <form class="d-flex" style="align-items: center" method="POST" action={{ url_for('restaurant_search') }}>
-              <input type="search" class="form-control m2-2" placeholder="Cerca" id="search" name="search_form">
+              <input type="search" class="form-control m2-2" placeholder="Cerca" id="search" name="search_form" style="margin-right: 3%">
               <button class="btn btn-outline-primary" type="submit">Cerca</button>
           </form>
         </div>
       </div>
     </nav>
-    {% with  messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <h1 class="display-5" style="text-align: center; margin-top: 5%">{{ message }}</h1>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    {% block content %}
+    <div class="container" style="margin-top: 5%">
+        {% with  messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <h1 class="display-5" style="text-align: center; margin-top: 5%">{{ message }}</h1>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}
 
-    {% endblock %}
+        {% endblock %}
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
         integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
