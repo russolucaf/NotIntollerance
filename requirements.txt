@@ -10,6 +10,7 @@ Flask-Bcrypt==0.7.1
 Flask-Bootstrap4==4.0.2
 flask-bootstrap5==0.1.dev1
 flask-mongoengine==1.0.0
+Flask-PyMongo==2.3.0
 Flask-Session==0.4.0
 Flask-WTF==1.0.0
 idna==3.3
